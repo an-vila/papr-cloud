@@ -2,7 +2,7 @@ export function Input({ label, error, icon: Icon, className = "", type = "text",
     return (
         <div className="w-full">
             {label && (
-                <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                <label className="block text-xs xl:text-base font-medium text-slate-700 mb-1.5">
                     {label} {required && <span className="text-red-500">*</span>}
                 </label>
             )}
@@ -16,7 +16,7 @@ export function Input({ label, error, icon: Icon, className = "", type = "text",
                     type={type}
                     className={`w-full bg-white border ${
                         error ? "border-red-500 focus:ring-red-500" : "border-slate-300 focus:border-orange-600 focus:ring-orange-600"
-                    } rounded-xl text-slate-900 placeholder-slate-400 text-sm ${
+                    } rounded-xl text-slate-900 placeholder-slate-400 text-base ${
                         Icon ? "pl-10" : "pl-3.5"
                     } pr-3.5 py-2.5 transition duration-150 focus:outline-none focus:ring-1 ${className}`}
                     {...props}
