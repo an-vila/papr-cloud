@@ -19,7 +19,7 @@ export const AppProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      toast.error(getErrorMsg(err, errorFallback));
+      toast.error(getErrorMsg(error, errorFallback));
 
       return false;
     }
