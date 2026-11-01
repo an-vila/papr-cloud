@@ -7,6 +7,32 @@ export const driveService = {
   getFiles: (folderId, search, sort) =>
     api.get("/api/files", { params: { folder_id: folderId, search, sort } }),
 
-  getFolderDetails: (folderId) =>
-    api.get(`/api/folders/${folderId}`),
+  getFolderDetails: (folderId) => api.get(`/api/folders/${folderId}`),
+
+  uploadFiles: (fileList, folderId) => {
+    const formData = new FormData();
+
+    Array.from(fileList).forEach((f) => formData.append("files", f));
+    if (folderId) formData.append("folder_id", folderId);
+
+    return api.post("/api/files/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  createFolder: (name, parentId) =>
+    api.post("api/folders", { name, parent_id: parentId }),
+
+  renameItem: (endpoint, id, name) =>
+    api.patch(`/api/${endpoint}/${id}/rename`, { name }),
+
+  moveItem: (endpoint, id, payload) =>
+    api.patch(`/api/${endpoint}/${id}/move`, payload),
+
+  deleteItem: (endpoint, id) => api.delete(`/api/${endpoint}/${id}`),
+
+  restoreItem: (endpoint, id) => api.post(`/api/${endpoint}/${id}/restore`),
+
+  permanentlyDeleteItem: (endpoint, id) =>
+    api.delete(`/api/${endpoint}/${id}/permanent`),
 };

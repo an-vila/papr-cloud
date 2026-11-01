@@ -1,25 +1,28 @@
 import { useRef } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { useDrive } from "@/hooks/useDrive";
-
-// Iconos
 import {
   HardDriveIcon,
   UserIcon,
   Trash2Icon,
   PlusIcon,
   HardDriveUploadIcon,
-  FolderPlusIcon
+  FolderPlusIcon,
 } from "lucide-react";
-
-// Componentes
 import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
-import { StorageWidget } from "@/components/layout/StorageWidget"; // Ajusta la ruta si usaste otra carpeta
+import { StorageWidget } from "@/components/layout/StorageWidget";
 
 const Sidebar = ({ onCreateFolderClick, isMobileOpen, setIsMobileOpen }) => {
-  const { isUploading } = useDrive();
+  const { isUploading, uploadFiles } = useDrive();
   const location = useLocation();
   const fileInputRef = useRef(null);
+
+  const handleFileSelect = (e) => {
+    if (e.taget.files && e.target.files.length > 0) {
+      uploadFiles(e.target.files, currentFolderId);
+      e.target.value = "";
+    }
+  };
 
   const navItems = [
     { label: "My Drive", path: "/", icon: HardDriveIcon },
@@ -54,7 +57,13 @@ const Sidebar = ({ onCreateFolderClick, isMobileOpen, setIsMobileOpen }) => {
         </div>
 
         <div className="p-4">
-          <input type="file" ref={fileInputRef} multiple className="hidden" />
+          <input
+            type="file"
+            ref={fileInputRef}
+            multiple
+            className="hidden"
+            onChange={handleFileSelect}
+          />
           <Dropdown
             trigger={
               <button
@@ -86,7 +95,8 @@ const Sidebar = ({ onCreateFolderClick, isMobileOpen, setIsMobileOpen }) => {
             const Icon = item.icon;
             const isActive =
               item.path === "/"
-                ? location.pathname === "/" || location.pathname.startsWith("/drive")
+                ? location.pathname === "/" ||
+                  location.pathname.startsWith("/drive")
                 : location.pathname === item.path;
 
             return (
