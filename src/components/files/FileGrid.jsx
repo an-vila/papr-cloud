@@ -65,7 +65,7 @@ const FileGrid = ({
               <FileCard key={file.id}
                 onPreview={onPreviewFile}
                 onShare={item => onShareItem({...item, item_type: "file"})}
-                onRename={item => onRenametem({...item, item_type: "file"})}
+                onRename={item => onRenameItem({...item, item_type: "file"})}
                 onMove={item => onMoveItem({...item, item_type: "file"})}
               onDelete={item => onDeleteItem({...item, item_type: "file"})} />
             ))}

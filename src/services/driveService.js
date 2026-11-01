@@ -4,6 +4,8 @@ export const driveService = {
   getFolders: (parentId) =>
     api.get("/api/folders", { params: { parent_id: parentId } }),
 
+  getAllFolders: () => api.get("/api/folders"),
+
   getFiles: (folderId, search, sort) =>
     api.get("/api/files", { params: { folder_id: folderId, search, sort } }),
 
@@ -35,4 +37,15 @@ export const driveService = {
 
   permanentlyDeleteItem: (endpoint, id) =>
     api.delete(`/api/${endpoint}/${id}/permanent`),
+
+  getFilePreview: (fileId) => api.get(`/api/files/${fileId}/preview`),
+
+  createShareLink: (resourceType, resourceId) =>
+    api.post("/api/shares", {
+      resource_type: resourceType,
+      resource_id: resourceId,
+      permission: "download",
+    }),
+
+  deleteShareLink: (shareId) => api.delete(`/api/shares/${shareId}`),
 };
