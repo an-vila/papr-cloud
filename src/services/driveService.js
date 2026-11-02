@@ -50,4 +50,6 @@ export const driveService = {
   deleteShareLink: (shareId) => api.delete(`/api/shares/${shareId}`),
 
   getSharedLinks: () => api.get("/api/shares"),
+
+  getPublicShare: (token) => api.get(`/api/shares/access/${token}`),
 };
