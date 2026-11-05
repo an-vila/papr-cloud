@@ -26,8 +26,15 @@ const FilePreview = ({ file, onClose }) => {
       .then(({ data }) => {
         if (isMounted) setPreviewUrl(data.url);
       })
-      .catch(() => {
-        if (isMounted) setError("Failed to load file preview");
+      .catch((error) => {
+        if (isMounted) {
+          const message = error.response?.data?.error;
+          setError(
+            typeof message === "string"
+              ? message
+              : "Failed to load file preview",
+          );
+        }
       })
       .finally(() => {
         if (isMounted) setIsLoading(false);
