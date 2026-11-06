@@ -68,6 +68,7 @@ export const AppProvider = ({ children }) => {
     login,
     register,
     logout,
+    refreshUser,
     isLoading,
     isAuthenticated: !!user
   };

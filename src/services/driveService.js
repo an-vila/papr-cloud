@@ -52,4 +52,8 @@ export const driveService = {
   getSharedLinks: () => api.get("/api/shares"),
 
   getPublicShare: (token) => api.get(`/api/shares/access/${token}`),
+
+  getTrash: () => api.get("/api/trash"),
+
+  emptyTrash: () => api.post("/api/trash/empty"),
 };
