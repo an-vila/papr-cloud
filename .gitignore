@@ -8,9 +8,17 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+jspm_packages
 dist
 dist-ssr
+build
+coverage
 *.local
+
+# Express / Backend files
+uploads
+temp
+tmp
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +30,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Env variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
