@@ -2,6 +2,8 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { initDB } from "./config/db.js";
+import authRouter from "./routes/authRouter.js"
 
 const app = express();
 
@@ -13,12 +15,18 @@ app.use(express.json({ limit: "100mb" }));
 
 app.get("/", (_req, res) => res.send("Server is running"));
 
+app.use("/api/auth", authRouter)
+
 app.use((err, _req, res, _next) => {
-  res.status(err.status || 500).json({ error: err.message || "Something went wrong."});
+  res
+    .status(err.status || 500)
+    .json({ error: err.message || "Something went wrong." });
 });
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`Server running at http:localhost:${port}`);
+initDB().then(() => {
+  app.listen(port, () => {
+    console.log(`Server running at http:localhost:${port}`);
+  });
 });

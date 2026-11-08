@@ -69,6 +69,8 @@ export async function initDB() {
       sql`CREATE INDEX IF NOT EXISTS idx_shares_owner    ON share_links (owner_id, created_at DESC)`,
       sql`CREATE INDEX IF NOT EXISTS idx_shares_resource ON share_links (resource_id)`,
     ]);
+
+    console.log("Database initialized successfully");
   } catch (error) {
     console.error("Error initializing dabatabse:", error);
     throw error;
