@@ -19,7 +19,7 @@ const SORT_MAP = {
 
 export const uploadFiles = async (req, res) => {
   try {
-    if (req.files?.length) {
+    if (!req.files?.length) {
       return res.status(400).json({ error: "No files uploaded." });
     }
 
@@ -61,10 +61,10 @@ export const uploadFiles = async (req, res) => {
         const randomString = crypto.randomBytes(8).toString("hex");
         const s3Key = `users/${req.user.id}/${Date.now()}_${randomString}${fileExt}`;
 
-        await uploadToStorage(multerFile.buffer, s3Key, multerFile.mimeType);
+        await uploadToStorage(multerFile.buffer, s3Key, multerFile.mimetype);
 
         const [row] = await sql`
-          INSERT INTO files (name, original_name, mime_type, size, s3_key, folder_id, owner_id) VALUES (${multerFile.originalname}, ${multerFile.originalname}, ${multerFile.mimeType}, ${multerFile.size}, ${s3Key}, ${targetFolderId}, ${req.user.id}) RETURNING *
+          INSERT INTO files (name, original_name, mime_type, size, s3_key, folder_id, owner_id) VALUES (${multerFile.originalname}, ${multerFile.originalname}, ${multerFile.mimetype}, ${multerFile.size}, ${s3Key}, ${targetFolderId}, ${req.user.id}) RETURNING *
           `;
 
         return row;
@@ -91,7 +91,7 @@ export const getFiles = async (req, res) => {
     } = req.query;
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.max(1, parseInt(page, 10) || 50);
+    const limitNum = Math.max(1, parseInt(limit, 10) || 50);
     const offset = (pageNum - 1) * limitNum;
     const orderBy = SORT_MAP[sort] || SORT_MAP.name_asc;
 
@@ -106,7 +106,7 @@ export const getFiles = async (req, res) => {
       sql`
         SELECT * FROM files
         WHERE owner_id = ${req.user.id} AND is_trashed = false
-        AND (${isSearch}::boolean = true AND name ILIKE ${pattern} OR ${isSearch}::booelan = false AND folder_id IS NOT DISTINCT FROM ${targetFolderId})
+        AND (${isSearch}::boolean = true AND name ILIKE ${pattern} OR ${isSearch}::boolean = false AND folder_id IS NOT DISTINCT FROM ${targetFolderId})
         ORDER BY ${sql.unsafe(orderBy)}
         LIMIT ${limitNum} OFFSET ${offset}
         `,
@@ -158,7 +158,7 @@ export const renameFile = async (req, res) => {
       return res.status(400).json({ error: "File name is required." });
     }
 
-    const [file] = sql`
+    const [file] = await sql`
       UPDATE files
       SET name = ${name.trim()}, updated_at = NOW()
       WHERE id = ${req.params.id} AND owner_id = ${req.user.id} AND is_trashed = false
@@ -188,6 +188,7 @@ export const moveFile = async (req, res) => {
       if (!destFolder) {
         return res.status(404).json({ error: "Destination folder not found." });
       }
+    }
 
       const [file] = await sql`
         UPDATE files
@@ -201,7 +202,7 @@ export const moveFile = async (req, res) => {
       }
 
       return res.status(200).json({ file });
-    }
+
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -230,7 +231,7 @@ export const softDeleteFile = async (req, res) => {
 
 export const restoreFile = async (req, res) => {
   try {
-    cosnt[file] = await sql`
+    const [file] = await sql`
       UPDATE files
       SET is_trashed = false, trashed_at = NULL, updated_at = NOW()
       WHERE id = ${req.params.id} AND owner_id = ${req.user.id} AND is_trashed = true
@@ -242,7 +243,7 @@ export const restoreFile = async (req, res) => {
     }
 
     return res.status(200).json({ message: "File restored from Trash." });
-  } catch {
+  } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };
@@ -261,7 +262,7 @@ export const permanentlyDeleteFile = async (req, res) => {
     await permanentDeleteFileRecord(file, req.user.id)
 
     return res.status(200).json({ message: "File permanently deleted."})
-  } catch {
+  } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 };

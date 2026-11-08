@@ -1,4 +1,4 @@
-import { sql } from "../config/db";
+import { sql } from "../config/db.js";
 import {
   restoreFolderHierarchy,
   softDeleteFolderHierarchy,

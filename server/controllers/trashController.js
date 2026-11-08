@@ -1,5 +1,5 @@
 import { sql } from "../config/db.js";
-import { emptyTrashHierarchy } from "../services/storageService";
+import { emptyTrashHierarchy } from "../services/storageService.js";
 
 export const getTrashItems = async (req, res) => {
   try {

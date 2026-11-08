@@ -1,6 +1,6 @@
 import express from "express";
-import { protect } from "../middleware/auth";
-import { emptyTrash, getTrashItems } from "../controllers/trashController";
+import { protect } from "../middleware/auth.js";
+import { emptyTrash, getTrashItems } from "../controllers/trashController.js";
 
 const trashRouter = express.Router();
 

@@ -8,7 +8,8 @@ import {
   renameFolder,
   restoreFolder,
   softDeleteFolder,
-} from "../controllers/folderController";
+} from "../controllers/folderController.js";
+import { protect } from "../middleware/auth.js";
 
 const folderRouter = express.Router();
 
