@@ -3,7 +3,8 @@ import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { initDB } from "./config/db.js";
-import authRouter from "./routes/authRouter.js"
+import authRouter from "./routes/authRouter.js";
+import folderRouter from "./routes/folderRouter.js";
 
 const app = express();
 
@@ -15,7 +16,8 @@ app.use(express.json({ limit: "100mb" }));
 
 app.get("/", (_req, res) => res.send("Server is running"));
 
-app.use("/api/auth", authRouter)
+app.use("/api/auth", authRouter);
+app.use("/api/folders", folderRouter);
 
 app.use((err, _req, res, _next) => {
   res
