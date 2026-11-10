@@ -8,7 +8,7 @@ export function ItemDropdown({ item, onPreview, onShare, onRename, onMove, onDel
                 trigger={
                     <button
                         type="button"
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity touch-manipulation"
                     >
                         <MoreVerticalIcon className="size-4" />
                     </button>

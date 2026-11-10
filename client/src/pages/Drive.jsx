@@ -17,6 +17,11 @@ const Drive = () => {
     fetchDriveContent,
     setCurrentFolderId,
     deleteItem: removeDriveItem,
+    moveItem: moveDriveItem,
+    breadcrumbs,
+    files,
+    folders,
+    isDriveLoading,
   } = useDrive();
 
   const [previewFile, setPreviewFile] = useState(null);
@@ -40,14 +45,18 @@ const Drive = () => {
 
   return (
     <div className="space-y-4">
-      <Breadcrumbs />
+      <Breadcrumbs breadcrumbs={breadcrumbs} />
       <FileGrid
+        files={files}
+        folders={folders}
+        isDriveLoading={isDriveLoading}
         onFolderClick={(folder) => navigate(`/drive/${folder.id}`)}
         onPreviewFile={setPreviewFile}
         onShareItem={setShareItem}
         onRenameItem={setRenameItem}
         onMoveItem={setMoveItem}
         onDeleteItem={setDeleteItem}
+        onQuickMove={moveDriveItem}
       />
 
       {previewFile && (

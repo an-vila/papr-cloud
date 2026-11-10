@@ -1,3 +1,6 @@
+import jwt from "jsonwebtoken";
+import { sql } from "../config/db.js";
+
 export const protect = async (req, res, next) => {
   const token = req.cookies?.token;
 

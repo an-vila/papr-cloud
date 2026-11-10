@@ -1,12 +1,9 @@
-import { useDrive } from "@/hooks/useDrive";
 import { HardDriveIcon } from "lucide-react";
 import { ChevronRightIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import React from "react";
 
-const Breadcrumbs = () => {
-  const { breadcrumbs } = useDrive();
-
+const Breadcrumbs = ({ breadcrumbs = [] }) => {
   return (
     <div className="flex items-center gap-1 text-sm text-slate-500 py-5 overflow-x-auto no-scrollbar">
       {breadcrumbs.map((item, index) => {

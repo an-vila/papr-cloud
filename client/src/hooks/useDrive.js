@@ -1,4 +1,10 @@
-import { useState, useCallback } from "react";
+import {
+  createContext,
+  createElement,
+  useContext,
+  useState,
+  useCallback,
+} from "react";
 import toast from "react-hot-toast";
 import { driveService } from "@/services/driveService";
 import { useApp } from "@/context/AppContext";
@@ -9,7 +15,51 @@ const ROOT_BREADCRUMB = [{ id: null, name: "My Drive" }];
 const isFolderItem = (item) =>
   item?.item_type === "folder" || (!item?.mime_type && item.path !== undefined);
 
-export const useDrive = () => {
+const sortFiles = (items, sort) => {
+  const result = [...(items || [])];
+
+  const compareName = (a, b) =>
+    String(a.name || a.original_name || "").localeCompare(
+      String(b.name || b.original_name || ""),
+      "es",
+      { sensitivity: "base", numeric: true },
+    );
+
+  switch (sort) {
+    case "name_desc":
+      return result.sort((a, b) => compareName(b, a));
+
+    case "name_asc":
+      return result.sort(compareName);
+
+    case "date_desc":
+      return result.sort(
+        (a, b) =>
+          new Date(b.created_at || b.uploaded_at || 0) -
+          new Date(a.created_at || a.uploaded_at || 0),
+      );
+
+    case "date_asc":
+      return result.sort(
+        (a, b) =>
+          new Date(a.created_at || a.uploaded_at || 0) -
+          new Date(b.created_at || b.uploaded_at || 0),
+      );
+
+    case "size_desc":
+      return result.sort((a, b) => (b.size || 0) - (a.size || 0));
+
+    case "size_asc":
+      return result.sort((a, b) => (a.size || 0) - (b.size || 0));
+
+    default:
+      return result.sort(compareName);
+  }
+};
+
+const DriveContext = createContext(null);
+
+const useDriveState = () => {
   const [currentFolderId, setCurrentFolderId] = useState(null);
   const [breadcrumbs, setBreadcrumbs] = useState(ROOT_BREADCRUMB);
   const [folders, setFolders] = useState([]);
@@ -18,6 +68,7 @@ export const useDrive = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("name_asc");
+  const [viewMode, setViewMode] = useState("grid");
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -38,7 +89,7 @@ export const useDrive = () => {
         ]);
 
         setFolders(folderRes.data.folders);
-        setFiles(fileRes.data.files);
+        setFiles(sortFiles(fileRes.data.files, sort));
         setBreadcrumbs(detailRes?.data?.breadcrumbs || ROOT_BREADCRUMB);
       } catch (error) {
         toast.error("Error loading drive contents");
@@ -225,5 +276,23 @@ export const useDrive = () => {
     deleteItem,
     restoreItem,
     permanentlyDeleteItem,
+    viewMode,
+    setViewMode,
   };
+};
+
+export const DriveProvider = ({ children }) => {
+  const drive = useDriveState();
+
+  return createElement(DriveContext.Provider, { value: drive }, children);
+};
+
+export const useDrive = () => {
+  const context = useContext(DriveContext);
+
+  if (!context) {
+    throw new Error("useDrive must be used within a DriveProvider");
+  }
+
+  return context;
 };

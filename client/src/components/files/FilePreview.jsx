@@ -1,36 +1,47 @@
 import { formatBytes } from "@/assets/assets";
-import api from "@/config/api";
 import { driveService } from "@/services/driveService";
-import { XIcon } from "lucide-react";
-import { Loader2Icon } from "lucide-react";
-import { FileTextIcon, DownloadIcon } from "lucide-react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { XIcon, Loader2Icon, FileTextIcon, DownloadIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const FilePreview = ({ file, onClose }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(Boolean(file?.id));
   const [error, setError] = useState(null);
 
-  const mime = file.mime_type || "";
+  const mime = file?.mime_type || "";
 
   useEffect(() => {
-    if (!file) return;
+    if (!file?.id) {
+      setPreviewUrl(null);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
 
     let isMounted = true;
+
+    setPreviewUrl(null);
     setIsLoading(true);
     setError(null);
 
-    api
-      .get(driveService.getFilePreview(file.id))
+    driveService
+      .getFilePreview(file.id)
       .then(({ data }) => {
-        if (isMounted) setPreviewUrl(data.url);
+        if (!isMounted) return;
+
+        if (typeof data?.url !== "string" || !data.url) {
+          setError("The server did not return a preview URL.");
+          return;
+        }
+
+        setPreviewUrl(data.url);
       })
-      .catch((error) => {
+      .catch((err) => {
         if (isMounted) {
-          const message = error.response?.data?.error;
+          const message = err.response?.data?.error || err.message;
+
           setError(
-            typeof message === "string"
+            typeof message === "string" && message
               ? message
               : "Failed to load file preview",
           );
@@ -43,7 +54,9 @@ const FilePreview = ({ file, onClose }) => {
     return () => {
       isMounted = false;
     };
-  }, [file]);
+  }, [file?.id]);
+
+  if (!file) return null;
 
   return (
     <div
@@ -55,14 +68,16 @@ const FilePreview = ({ file, onClose }) => {
         className="w-full max-w-4xl bg-white border border-slate-200 rounded-2xl flex flex-col max-h-[92vh] overflow-hidden animate-slide-up"
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <div>
-            <FileTextIcon className="size-5 text-orange-600 shrink-0 " />
-            <div className="flex items-center gap-3 min-w-0 pr-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <FileTextIcon className="size-5 text-orange-600 shrink-0" />
+
+            <div className="min-w-0">
               <h3 className="text-base font-medium text-slate-900 truncate">
                 {file.name}
               </h3>
+
               <p className="text-xs text-slate-500">
-                {formatBytes(file.size)})
+                {formatBytes(file.size || 0)}
               </p>
             </div>
           </div>
@@ -74,14 +89,16 @@ const FilePreview = ({ file, onClose }) => {
                 download={file.name}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-medium rounded-md trnasition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded-md transition"
               >
-                <DonwloadIcon className="w-3.5 h-3.5" />
+                <DownloadIcon className="w-3.5 h-3.5" />
                 <span>Download</span>
               </a>
             )}
+
             <button
               onClick={onClose}
+              type="button"
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700"
             >
               <XIcon className="size-5" />
@@ -108,6 +125,7 @@ const FilePreview = ({ file, onClose }) => {
           ) : mime.startsWith("video/") ? (
             <video
               src={previewUrl}
+              controls
               className="max-h-[70vh] max-w-full rounded-xl border border-slate-200"
             />
           ) : mime.startsWith("audio/") ? (
@@ -115,6 +133,7 @@ const FilePreview = ({ file, onClose }) => {
               <p className="text-sm text-slate-800 font-semibold">
                 {file.name}
               </p>
+
               <audio src={previewUrl} controls className="w-72 md:w-96" />
             </div>
           ) : mime === "application/pdf" ? (
@@ -126,6 +145,7 @@ const FilePreview = ({ file, onClose }) => {
           ) : (
             <div className="text-center p-10 bg-white border border-slate-200 rounded-2xl max-w-sm">
               <FileTextIcon className="size-12 text-slate-400 mx-auto mb-3" />
+
               <p className="text-sm text-slate-700 mb-1">
                 No direct preview available
               </p>

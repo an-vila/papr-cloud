@@ -13,12 +13,12 @@ import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { StorageWidget } from "@/components/layout/StorageWidget";
 
 const Sidebar = ({ onCreateFolderClick, isMobileOpen, setIsMobileOpen }) => {
-  const { isUploading, uploadFiles } = useDrive();
+  const { isUploading, uploadFiles, currentFolderId } = useDrive();
   const location = useLocation();
   const fileInputRef = useRef(null);
 
   const handleFileSelect = (e) => {
-    if (e.taget.files && e.target.files.length > 0) {
+    if (e.target.files && e.target.files.length > 0) {
       uploadFiles(e.target.files, currentFolderId);
       e.target.value = "";
     }

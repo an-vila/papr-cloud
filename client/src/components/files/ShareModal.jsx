@@ -9,6 +9,7 @@ import { XIcon } from "lucide-react";
 import { CopyIcon } from "lucide-react";
 import { useEffect } from "react";
 import { driveService } from "@/services/driveService";
+import toast from "react-hot-toast";
 
 const ShareModal = ({ item, isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
@@ -87,6 +88,7 @@ const ShareModal = ({ item, isOpen, onClose }) => {
               {item?.item_type === "folder" ? "folder" : "file"}
             </p>
           </div>
+        </div>
 
           {isLoading ? (
             <div className="py-6 flex flex-col items-center justifyjustify-center gap-2 text-slate-500">
@@ -150,7 +152,7 @@ const ShareModal = ({ item, isOpen, onClose }) => {
               </Button>
             </div>
           )}
-        </div>
+
       </div>
     </Modal>
   );

@@ -23,7 +23,7 @@ export const driveService = {
   },
 
   createFolder: (name, parentId) =>
-    api.post("api/folders", { name, parent_id: parentId }),
+    api.post("/api/folders", { name, parent_id: parentId }),
 
   renameItem: (endpoint, id, name) =>
     api.patch(`/api/${endpoint}/${id}/rename`, { name }),
